@@ -1,0 +1,300 @@
+
+	;implement the 16 bit operations.
+	;
+	; works for 16 or 8-bit accumulator.
+	;
+	;
+	; see:
+	; http://jacob.jkrall.net/lost-operator/
+	; TAOCP 4A Part 1, pp 49
+	;
+	; 1 & 1 -> 1
+	; 1 & 0 -> 0
+	; 0 & 1 -> 0
+	; 0 & 0 -> 0
+
+	; ~1 & 1 -> 0
+	; ~1 & 0 -> 0
+	; ~0 & 1 -> 1
+	; ~0 & 0 -> 0
+
+	; 1 & ~1 -> 0
+	; 1 & ~0 -> 1
+	; 0 & ~1 -> 0
+	; 0 & ~0 -> 0
+
+
+	; ~1 & ~1 -> 0
+	; ~1 & ~0 -> 0
+	; ~0 & ~1 -> 0
+	; ~0 & ~0 -> 1
+
+
+	; 1 | 1 -> 1
+	; 1 | 0 -> 1
+	; 0 | 1 -> 1
+	; 0 | 0 -> 0
+
+	; ~1 | 1 -> 1
+	; ~1 | 0 -> 0
+	; ~0 | 1 -> 1
+	; ~0 | 0 -> 1
+
+	; 1 | ~1 -> 1
+	; 1 | ~0 -> 1
+	; 0 | ~1 -> 0
+	; 0 | ~0 -> 1
+
+
+	; ~1 | ~1 -> 0
+	; ~1 | ~0 -> 1
+	; ~0 | ~1 -> 1
+	; ~0 | ~0 -> 1
+
+
+	; 1 ^ 1 -> 0
+	; 1 ^ 0 -> 1
+	; 0 ^ 1 -> 1
+	; 0 ^ 0 -> 0
+
+	; ~1 ^ 1 -> 1
+	; ~1 ^ 0 -> 0
+	; ~0 ^ 1 -> 0
+	; ~0 ^ 0 -> 1
+
+	; 1 ^ ~1 -> 1
+	; 1 ^ ~0 -> 0
+	; 0 ^ ~1 -> 0
+	; 0 ^ ~0 -> 1
+
+
+	MACRO
+	bit_false &p, &q
+	; boolean op #0
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 0
+	; f(0,1) -> 0
+	; f(0,0) -> 0
+	; aka constant false
+	lda #0
+	MEND
+
+
+	MACRO
+	bit_nor &p, &q
+	; boolean op #1
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 0
+	; f(0,1) -> 0
+	; f(0,0) -> 1
+	; aka ~p & ~q
+	; aka ~(p | q)
+	lda &p
+	ora &q
+	eor #-1
+	MEND
+
+	MACRO
+	bit_lt &p, &q
+	; boolean op #2
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 0
+	; f(0,1) -> 1
+	; f(0,0) -> 0
+	; aka p < q
+	; aka ~p & q
+	lda &p
+	eor #-1
+	and &q
+	MEND
+
+
+	MACRO
+	bit_not_p &p, &q
+	; boolean op #3
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 0
+	; f(0,1) -> 1
+	; f(0,0) -> 1
+	; aka ~p
+	lda &p
+	eor #-1
+	MEND
+
+	MACRO
+	bit_gt &p, &q
+	; boolean op #4
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 1
+	; f(0,1) -> 0
+	; f(0,0) -> 0
+	; aka p > q
+	; aka p & ~q
+	lda &q
+	eor #-1
+	and &p 
+	MEND
+
+	MACRO
+	bit_not_q &p, &q
+	; boolean op #5
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 1
+	; f(0,1) -> 0
+	; f(0,0) -> 1
+	; aka ~q
+	lda &q
+	eor #-1
+	MEND
+
+	MACRO
+	bit_xor &p, &q
+	; boolean op #6
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 1
+	; f(0,1) -> 1
+	; f(0,0) -> 0
+	; aka p != q
+	; aka p ^ q
+	lda &p
+	eor &q
+	MEND
+
+	MACRO
+	bit_ne &p, &q
+	; alternate name for boolean op #6
+	bit_xor &p, &q
+	MEND
+
+
+	MACRO
+	bit_nand &p, &q
+	; boolean op #7
+	;
+	; f(1,1) -> 0
+	; f(1,0) -> 1
+	; f(0,1) -> 1
+	; f(0,0) -> 1
+	; aka ~p | ~q
+	; aka ~(p & q)
+	lda &p
+	and &q
+	eor #-1
+	MEND
+
+	MACRO
+	bit_and &p, &q
+	; boolean op #8
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 0
+	; f(0,1) -> 0
+	; f(0,0) -> 0
+	; aka p & q
+	lda &p
+	and &q
+	MEND
+
+	MACRO
+	bit_eq &p, &q
+	; boolean op #9
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 0
+	; f(0,1) -> 0
+	; f(0,0) -> 1
+	; aka p = q
+	; aka ~(p ^ q)
+	lda &p
+	eor &q
+	eor #-1
+	MEND
+
+	MACRO
+	bit_q &p, &q
+	; boolean op #10
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 0
+	; f(0,1) -> 1
+	; f(0,0) -> 0
+	; aka q
+	lda &q
+	MEND
+
+	MACRO
+	bit_le &p, &q
+	; boolean op #11
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 0
+	; f(0,1) -> 1
+	; f(0,0) -> 1
+	; aka p implies q
+	; aka p <= q
+	; aka ~p | q
+	lda &p
+	eor #-1
+	ora &q
+	MEND
+
+	MACRO
+	bit_p &p, &q
+	; boolean op #12
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 1
+	; f(0,1) -> 0
+	; f(0,0) -> 0
+	; aka p
+	lda &p
+	MEND
+
+	MACRO
+	bit_ge &p, &q
+	; boolean op #13
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 1
+	; f(0,1) -> 0
+	; f(0,0) -> 1
+	; aka p >= q
+	; aka p | ~q
+	lda &q
+	eor #-1
+	ora &p
+	MEND
+
+	MACRO
+	bit_or &p, &q
+	; boolean op #14
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 1
+	; f(0,1) -> 1
+	; f(0,0) -> 0
+	; aka p | q
+	lda &p
+	ora &q
+	MEND
+
+	MACRO
+	bit_true &p, &q
+	; boolean op #15
+	;
+	; f(1,1) -> 1
+	; f(1,0) -> 1
+	; f(0,1) -> 1
+	; f(0,0) -> 1
+	lda #-1
+	MEND
+
+
+
