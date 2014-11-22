@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-
+#include <string.h>
+#include <sysexits.h>
+#include <unistd.h>
 
 const char *tokens[]={
 /*80*/	" END ",
@@ -151,7 +152,7 @@ const char *tokens[]={
 */
 
 
-void translate(FILE *f)
+int translate(FILE *f, FILE *out)
 {
     for(;;)
     {
@@ -161,7 +162,7 @@ void translate(FILE *f)
         if (feof(f))
         {
             fprintf(stderr, "Unexpected eof.\n");
-            break;
+            return EX_DATAERR;
         }
         
         // last line.
@@ -172,36 +173,98 @@ void translate(FILE *f)
         if (feof(f))
         {
             fprintf(stderr, "Unexpected eof.\n");
-            break;        
+            return EX_DATAERR;
         }
         
-        fprintf(stdout, "% 5d: ", x); 
+        fprintf(out, "% 5d: ", x); 
     
         for (;;)
         {
-            x  = fgetc(f);
+            x = fgetc(f);
             if (x == 0) break;
             
             if (x < 0)
             {
                 fprintf(stderr, "Unexpected eof.\n");
-                break;
+                return EX_DATAERR;
             }   
             if (x > 0x7f)
-                fputs(tokens[x & 0x7f], stdout);
-            else if (x > 0x1f) fputc(x, stdout);         
+                fputs(tokens[x & 0x7f], out);
+            else if (x > 0x1f) fputc(x, out);         
         
         }
     
-        fprintf(stdout, "\n");
+        fprintf(out, "\n");
     }
 
-
+    return 0;
 }
 
+
+void usage(void)
+{
+   fputs("Usage: blist [-o output file] input file\n",stdout);
+}
 
 int main(int argc, char **argv)
 {
-    translate(stdin);
-    return 0;
+    int c, rv;
+    const char *outfile = NULL;
+    FILE *input = stdin;
+    FILE *output = stdout;
+
+    while ((c = getopt(argc, argv, "ho:")) != -1)
+    {
+        switch(c)
+        {
+        case 'o': 
+            outfile = optarg;
+            break;
+        case 'h':
+            usage();
+            return 0;
+        default:
+            usage();
+            return EX_USAGE;
+        }
+    }
+
+    argc -= optind;
+    argv += optind;
+
+
+    switch (argc)
+    {
+    case 0:
+        break;
+    case 1:
+        input = fopen(argv[0], "r");
+        if (!input) 
+        {
+            perror(argv[0]);
+            return EX_NOINPUT;
+        }
+        break;
+    default:
+        usage();
+        return EX_USAGE;
+    }
+
+    if (outfile && strcmp(outfile, "-")) {
+        output = fopen(outfile, "w");
+        if (!output)
+        {
+            perror(outfile);
+            if (input != stdin) fclose(input);
+            return EX_CANTCREAT;
+        }
+    }
+
+    rv = translate(input, output);
+
+    if (input != stdin) fclose(input);
+    if (output != stdout) fclose(output);
+
+    return rv;
 }
+
