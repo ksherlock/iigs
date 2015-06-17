@@ -1,0 +1,13 @@
+**************************************************
+***
+*** PrinterTool.equ
+***
+
+LT_ID		equ $746C ;Printer Tool ("lt") ID
+
+LTOpen		equ 0
+LTClose		equ 1
+LTReset		equ 2
+LTControl	equ 3
+LTWriteChar	equ 5
+LTWriteBuffer	equ 6

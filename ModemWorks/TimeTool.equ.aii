@@ -1,0 +1,17 @@
+
+**************************************************
+***
+*** TimeTool.equ
+***
+
+TT_ID		equ $7474 ;Time Tool ("tt") ID
+
+Ticker		equ 0
+GetTicks	equ 1
+CountDown	equ 2
+WaitTicks	equ 3
+WaitSeconds	equ 4
+SetCounter	equ 5
+GetTimeStr	equ 6
+FastCPU		equ 7
+SlowCPU		equ 8

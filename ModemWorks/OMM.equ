@@ -1,0 +1,56 @@
+**********************************************************************
+***
+***     omm.asm         Object Module Manager interface constants
+***                     Copyright (C) 1990 Morgan Davis Group
+***
+
+*------------------------------*
+*       Loader Constants       *
+*------------------------------*
+
+OMMVEC          equ    $3f8    ;user vector
+
+OMM_ID          equ    0       ;index of object module mgr module
+OMM_HEADER      equ    16      ;size of OMM header
+
+*------------------------------*
+*       Messages Types         *
+*------------------------------*
+
+MSG_INIT        equ    0       ;initialize module
+MSG_QUIT        equ    1       ;quit (shutdown) module
+MSG_AMPR        equ    2       ;execute ampersand service routine
+MSG_USER        equ    3       ;user (non-applesoft) service request
+MSG_REL1        equ    4       ;alert module before relocation
+MSG_REL2        equ    5       ;alert module after relocation
+MSG_KILL        equ    6       ;death notice (sent before actual death)
+MSG_DIED        equ    7       ;obituary (sent after death)
+MSG_BORN        equ    8       ;birth notice
+MSG_IDLE        equ    9       ;idle event for module
+MSG_INFO        equ    10      ;get modules info string
+MSG_NEXT        equ    11
+
+*------------------------------*
+*       OMM control errors     *
+*------------------------------*
+
+LER_NOERR       equ    0       ;no error
+LER_CNIMP       equ    1       ;control class not implemented
+LER_FNIMP       equ    2       ;user control function not implemented
+LER_SIGNF       equ    3       ;signature not found
+
+*------------------------------*
+*    OMM User Function Codes   *
+*------------------------------*
+
+OMM_GETID       equ    0       ;get module index by signature (into X)
+OMM_XOAMP       equ    1       ;execute original ampersand handler
+OMM_FREE        equ    2       ;free a module whose index is at A1
+OMM_PUTWORD     equ    3       ;put word at A1 into numeric var
+OMM_PUTSTR      equ    4       ;put string into string var (lowtr = descrip)
+OMM_GETSTR      equ    5       ;get string var's descriptor into lowtr
+OMM_PADDEC      equ    6       ;print decimal word (lowtr: width, low, high)
+OMM_C2PSTR      equ    7       ;copy C to P-string (lowtr = desc, a1 = targ)
+OMM_COUNT       equ    8       ;get count of modules
+OMM_GETINFO     equ    9       ;get module's info string
+OMM_NEXT        equ    10

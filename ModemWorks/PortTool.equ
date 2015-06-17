@@ -1,0 +1,37 @@
+**************************************************
+***
+*** PortTool.equ
+***
+
+PT_ID		equ $7470 ;Port Tool ("pt") ID
+
+SerOpen		equ 0
+SerClose	equ 1
+SerReset	equ 2
+SerSendBreak	equ 3
+SerSetDTR	equ 4
+SerClearDTR	equ 5
+SerSetPortBits	equ 6
+SerSetSpeed	equ 7
+SerGetSpeed	equ 8
+SerGetDCD	equ 9
+SerWriteChar	equ 10
+SerWriteBuffer	equ 11
+SerReadChar	equ 12
+SerReadBuffer	equ 13
+SerFlushInQ	equ 14
+SerGetInQ	equ 15
+SerGetInBuf	equ 16
+SerSetInBuf	equ 17
+SerSetFlow	equ 18
+SerAddCompVec	equ 19
+SerDelCompVec	equ 20
+SerClearCompVec	equ 21
+SerAddSearch	equ 22
+SerDelSearch	equ 23
+SerClearSearch	equ 26
+SerGetSearch	equ 24
+SerShowSearch	equ 25
+SerGetTimedByte	equ 27
+SerOutBuffering	equ 28
+SerSetDCD	equ 29

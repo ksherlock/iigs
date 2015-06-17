@@ -1,0 +1,8 @@
+**************************************************
+***
+*** SendTool.equ
+***
+
+ST_ID		equ $7473 ;Send Tool ("st") ID
+
+STTransfer	equ 0

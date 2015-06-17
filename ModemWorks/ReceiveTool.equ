@@ -1,0 +1,8 @@
+**************************************************
+***
+*** ReceiveTool.equ
+***
+
+RT_ID		equ $7472 ;Receive Tool ("rt") ID
+
+RTTransfer	equ 0

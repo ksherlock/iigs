@@ -1,0 +1,23 @@
+**************************************************
+***
+*** ConsoleTool.equ
+***
+
+CT_ID		equ $7463 ;Console Tool ("ct") ID
+
+CTOpen		equ 0
+CTClose		equ 1
+CTReset		equ 2
+CTControl	equ 3
+CTStatus	equ 4
+CTGetXY		equ 5
+CTWriteChar	equ 6
+CTWriteBuffer	equ 7
+CTTestChar	equ 8
+CTReadChar	equ 9
+CTFlushInQ	equ 10
+CTShowCursor	equ 11
+CTHideCursor	equ 12
+CTSetBellAttr	equ 13
+CTSetTermcap	equ 14
+CTGotoXY	equ 15

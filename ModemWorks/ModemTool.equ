@@ -1,0 +1,26 @@
+************************************************************
+***
+*** ModemTool.equ
+***
+
+MT_ID		equ $746d ;Modem Tool ('mt') ID
+
+InitModem	equ 0
+ModemExit	equ 1
+IsOnline	equ 2
+HasMNP		equ 3
+DialNumber	equ 4
+SetBusy		equ 5
+HandleConnect	equ 6
+AnswerLine	equ 7
+HangUp		equ 8
+IsRinging	equ 9
+SetMNP		equ 10
+OrigAnsLine	equ 11
+ResetModem	equ 12
+SetSpeaker	equ 13
+GetMode		equ 14
+ModemType	equ 15
+ConnectSpeed	equ 16
+SetModem	equ 17
+SetModemSpeed	equ 18
