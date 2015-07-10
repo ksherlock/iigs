@@ -1,0 +1,41 @@
+#pragma cda "name" start_routine shutdown_routine
+#pragma cdev start_routine
+#pragma databank [1|0]
+#pragma debug flags
+	0	turn off all debugging
+	-1	turn on all debugging
+	1	range checking
+	2	source level debugging
+	4	generate profile code
+	8	generate traceback code
+	16	check for stack errors
+#pragma expand [1|0]
+#pragma float [1|0] slot
+#pragma ignore flags
+	1	ignore illegal characters in unprocessed code
+#pragma keep "name"
+#pragma lint flags
+	-1	enable all lints
+	1	undefined functions
+	2	missing function type
+	4	missing parameter list
+	8	unknown pragma
+
+#pragma memorymodel [1|0]
+#pragma nba start_routine
+#pragma nda open_routine close_routine action_routine init period eventmask "name"
+#pragma noroot
+#pragma optimize flags
+	0	turn off all optimizations
+	-1	turn on all optimizations
+	1	intermediate code optimizer
+	2	native code optimizer
+	4	register optimizer
+	8	disable stack repair code
+	16	common sub expression elimination
+	32	loop invarient removal
+#pragma path "path"
+#pragma rtl
+#pragma stacksize size
+#pragma toolparms [1|0]
+#pragma xcmd start_routine
