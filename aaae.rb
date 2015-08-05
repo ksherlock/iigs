@@ -37,15 +37,16 @@ def output_bytes(name, data)
 	tmp.each_byte {|b|
 		print "    " if index == 0
 
-		printf("%02x, ", b)
+		printf("0x%02x, ", b)
 
 		index = index + 1
-		if index == 16
+		if index == 8
 			print "\n"
 			index = 0
 		end
 	}
-	print "\n" if index > 0
+	puts "0x00\n"
+	#print "\n" if index > 0
 	puts "};"
 end
 
@@ -66,10 +67,10 @@ def output_strings(name, data)
 	data.each {|x|
 
 		# escape \
-		x = x.gsub(/\\/, '\\')
+		x = x.gsub(/([\\"])/) {|m| '\\' + m }
 
 		# escape "
-		x = x.gsub(/"/, '\"')
+		#x = x.gsub(/"/, '\"')
 
 		# escape chars...
 		# unfortunately, \x doesn't have a length limit so
