@@ -33,7 +33,7 @@
 	4	register optimizer
 	8	disable stack repair code
 	16	common sub expression elimination
-	32	loop invarient removal
+	32	loop invariant removal
 #pragma path "path"
 #pragma rtl
 #pragma stacksize size
