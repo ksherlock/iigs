@@ -34,6 +34,7 @@
 	8	disable stack repair code
 	16	common sub expression elimination
 	32	loop invariant removal
+	64	disable variadic stack repair code
 #pragma path "path"
 #pragma rtl
 #pragma stacksize size
