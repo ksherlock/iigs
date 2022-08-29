@@ -59,7 +59,7 @@ const char *tokens[]={
 	" STOP ",
 	" ON ",
 	" WAIT ",
-	" LIST ",
+	" LOAD ",
 	" SAVE ",
 	" DEF ",
 	" POKE ",	
