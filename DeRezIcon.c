@@ -10,6 +10,14 @@
 #include <memory.h>
 
 
+/*
+ * This will DeRez icons and cursors from a resource file.
+ *
+ * Essentially "DeRez file Types.Rez" but with prettier output.
+ *
+ */
+
+
 typedef struct IconHeader {
    Word iconType; // bit 15 = color (1) or b/w (0)
    Word iconSize; // number of bytes
@@ -18,6 +26,22 @@ typedef struct IconHeader {
    // Byte iconImage[iconSize];
    // Byte iconMask[iconSize];
 } IconHeader;
+
+typedef struct CursorHeader {
+   Word cursorHeight; // height, in pixels
+   Word cursorWidth; // width, in pixels.
+   // Byte cursorImage[height*width]
+   // Byte cursorMask[height*width]
+   // 
+} CursorHeader;
+
+
+typedef struct CursorTrailer {
+   Word cursorY; // hotspot Y
+   Word cursorX; // hotspot X.
+   Word cursorFlags; // cursor ID
+   // 8 bytes filler
+} CursorTrailer;
 
 
 GSString255Ptr c2gs(const char *cp) {
@@ -48,28 +72,14 @@ void dump(const unsigned char *ptr, unsigned count) {
 	fputs("\"\n", stdout);
 }
 
-void one_icon(const char *name, ResID id) {
+void one_icon(ResID id, ResAttr attr, unsigned char *ptr, unsigned long length) {
 
-	Handle h;
-	unsigned char *ptr;
 	IconHeader *header;
-	ResAttr attr;
 	unsigned hh;
 	unsigned ww;
 	unsigned i;
 
-
-	attr = GetResourceAttr(rIcon, id);
-	h = LoadResource(rIcon, id);
-	if (_toolErr) {
-		fprintf(stderr, "%s: LoadResource: $%04x\n", name, _toolErr);
-
-	}
-
-
-	HLock(h);
-
-	header = *(IconHeader **)h;
+	header = (IconHeader *)ptr;
 
 	hh = header->iconHeight;
 	ww = header->iconWidth >> 1;
@@ -79,7 +89,7 @@ void one_icon(const char *name, ResID id) {
 	printf("    %u, // height\n", header->iconHeight);
 	printf("    %u, // width\n\n", header->iconWidth);
 
-	ptr = ((unsigned char *)header) + sizeof(IconHeader);
+	ptr += sizeof(IconHeader);
 	// print the icon
 
 	for (i = 0; i < hh; ++i) {
@@ -94,13 +104,53 @@ void one_icon(const char *name, ResID id) {
 		dump(ptr, ww);
 		ptr += ww;
 	}
-	printf("}\n\n");
-
-
-	ReleaseResource(-1, rIcon, id);
-	HUnlock(h);
-
+	printf("};\n\n");
 }
+
+
+void one_cursor(ResID id, ResAttr attr, unsigned char *ptr, unsigned long length) {
+
+	CursorHeader *header;
+	CursorTrailer *trailer;
+	unsigned hh;
+	unsigned ww;
+	unsigned i;
+
+	header = (CursorHeader *)ptr;
+
+	hh = header->cursorHeight;
+	ww = (header->cursorWidth ) << 1;
+
+	printf("resource rCursor(%lu, $%04x) {\n", id, attr);
+	printf("    %u, // height\n", header->cursorHeight);
+	printf("    %u, // width (%d bytes)\n\n", header->cursorWidth, ww << 1);
+
+	ptr += sizeof(CursorHeader);
+	// print the cursor
+
+	for (i = 0; i < hh; ++i) {
+		dump(ptr, ww);
+		ptr += ww;
+	}
+
+	printf("    ,\n");
+	// print the mask
+
+	for (i = 0; i < hh; ++i) {
+		dump(ptr, ww);
+		ptr += ww;
+	}
+	printf("    ,\n");
+
+	trailer = (CursorTrailer *)ptr;
+	printf("    %u, // hotspot Y\n", trailer->cursorY);
+	printf("    %u, // hotspot X\n\n", trailer->cursorX);
+	printf("    $%02x // flags (%d mode)\n", trailer->cursorFlags, trailer->cursorFlags & 0x80 ? 640 : 320);
+	printf("};\n\n");
+}
+
+
+
 
 void one_file(const char *name) {
 	GSString255Ptr gname;
@@ -120,15 +170,55 @@ void one_file(const char *name) {
 
 	depth = SetResourceFileDepth(1);
 
+	// icons
 	for (ri = 1; ; ++ri) {
+		Handle h;
+		ResAttr attr;
 		ResID id = GetIndResource(rIcon, ri);
 		if (_toolErr == resIndexRange) break;
 		if (_toolErr) {
 			fprintf(stderr, "%s: GetIndResource: $%04x\n", name, _toolErr);
 			continue;
 		}
-		one_icon(name, id);
+
+		attr = GetResourceAttr(rIcon, id);
+		h = LoadResource(rIcon, id);
+		if (_toolErr) {
+			fprintf(stderr, "%s: LoadResource: $%04x\n", name, _toolErr);
+			continue;
+		}
+
+		HLock(h);
+		one_icon(id, attr, *(char **)h, GetHandleSize(h));
+		HUnlock(h);
+		ReleaseResource(-1, rIcon, id);
 	}
+
+	// cursors
+	for (ri = 1; ; ++ri) {
+		Handle h;
+		ResAttr attr;
+		ResID id = GetIndResource(rCursor, ri);
+		if (_toolErr == resIndexRange) break;
+		if (_toolErr) {
+			fprintf(stderr, "%s: GetIndResource: $%04x\n", name, _toolErr);
+			continue;
+		}
+
+		attr = GetResourceAttr(rCursor, id);
+		h = LoadResource(rCursor, id);
+		if (_toolErr) {
+			fprintf(stderr, "%s: LoadResource: $%04x\n", name, _toolErr);
+			continue;
+		}
+
+		HLock(h);
+		one_cursor(id, attr, *(char **)h, GetHandleSize(h));
+		HUnlock(h);
+		ReleaseResource(-1, rCursor, id);
+	}
+
+
 
 	SetResourceFileDepth(depth);
 	CloseResourceFile(rfd);
